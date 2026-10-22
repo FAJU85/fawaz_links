@@ -1,6 +1,8 @@
 node_modules/
 build/
-dist/
+dist/*
+!dist/.gitkeep
+!dist/index.html
 coverage/
 .DS_Store
 *.log
