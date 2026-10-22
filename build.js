@@ -27,7 +27,21 @@ try {
   console.log('Starting Vite build...');
   execSync('npx vite build', { stdio: 'inherit' });
   console.log('Vite build completed successfully.');
+
+  // Create 200.html and 404.html for native Cloudflare Pages SPA routing
+  const builtHtml = path.join(distDir, 'index.html');
+  if (fs.existsSync(builtHtml)) {
+    fs.copyFileSync(builtHtml, path.join(distDir, '200.html'));
+    fs.copyFileSync(builtHtml, path.join(distDir, '404.html'));
+  }
+
+  // Remove any conflicting _redirects file that might trigger code 100324
+  const distRedirects = path.join(distDir, '_redirects');
+  if (fs.existsSync(distRedirects)) {
+    fs.unlinkSync(distRedirects);
+  }
 } catch (error) {
   console.error('Vite build failed, keeping fallback dist assets:', error.message);
   process.exit(1);
 }
+
