@@ -432,7 +432,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     contactForm.reset();
                 } else {
                     const err = await res.json().catch(() => ({}));
-                    throw new Error(err.error || 'Server error');
+                    const errMsg = err.error || (res.status === 404 || res.status === 405
+                        ? 'خدمة الإرسال غير متاحة حالياً. يرجى التواصل عبر لينكد إن.'
+                        : 'حدث خطأ في الخادم أثناء الإرسال. يرجى المحاولة لاحقاً.');
+                    throw new Error(errMsg);
                 }
             } catch (err: any) {
                 if (contactMsg) {

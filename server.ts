@@ -201,21 +201,27 @@ function escapeHtml(str: string): string {
 
 // API: Handle Contact Request
 app.post("/api/contact-request", async (req: Request, res: Response) => {
-    const { name, company, position, mobile, email } = req.body;
+    const rawName = req.body.name || req.body.fullName || req.body.full_name;
+    const rawEmail = req.body.email;
+    const rawCompany = req.body.company || req.body.organization || "غير محدد";
+    const rawPosition = req.body.position || req.body.title || req.body.service || "طلب تواصل";
+    const rawMobile = req.body.mobile || req.body.phone;
+    const rawNotes = req.body.notes || req.body.message || "";
 
-    if (!name || !email || !company || !position) {
-        return res.status(400).json({ error: "Missing required fields" });
+    if (!rawName || !rawEmail) {
+        return res.status(400).json({ error: "Missing required fields (name and email)" });
     }
 
-    if (!validator.isEmail(String(email).trim())) {
+    if (!validator.isEmail(String(rawEmail).trim())) {
         return res.status(400).json({ error: "Invalid email address" });
     }
 
-    const cleanName = String(name).trim();
-    const cleanCompany = String(company).trim();
-    const cleanPosition = String(position).trim();
-    const cleanEmail = String(email).trim();
-    const cleanMobile = mobile ? String(mobile).trim() : "N/A";
+    const cleanName = String(rawName).trim();
+    const cleanCompany = String(rawCompany).trim();
+    const cleanPosition = String(rawPosition).trim();
+    const cleanEmail = String(rawEmail).trim();
+    const cleanMobile = rawMobile ? String(rawMobile).trim() : "N/A";
+    const cleanNotes = rawNotes ? String(rawNotes).trim() : "";
 
     const hfToken = process.env.HF_TOKEN;
     const hfDataset = process.env.HF_DATASET;
@@ -232,6 +238,7 @@ app.post("/api/contact-request", async (req: Request, res: Response) => {
             position: cleanPosition, 
             mobile: cleanMobile, 
             email: cleanEmail, 
+            notes: cleanNotes,
             timestamp, 
             status: "pending" 
         };
@@ -256,7 +263,11 @@ app.post("/api/contact-request", async (req: Request, res: Response) => {
         }
 
         // 3. Telegram Notification with robust HTML parsing (avoid Markdown underscore bugs)
-        const telegramHtml = `🔔 <b>طلب معلومات اتصال جديد</b>\n----------------------------\n<b>ID:</b> <code>${requestId}</code>\n👤 <b>الاسم:</b> ${escapeHtml(cleanName)}\n🏢 <b>الشركة:</b> ${escapeHtml(cleanCompany)}\n💼 <b>المنصب:</b> ${escapeHtml(cleanPosition)}\n📧 <b>الإيميل:</b> ${escapeHtml(cleanEmail)}\n📱 <b>الجوال:</b> ${escapeHtml(cleanMobile)}\n----------------------------\n✅ للموافقة: /approve_${requestId}\n❌ للرفض: /reject_${requestId}`;
+        let telegramHtml = `🔔 <b>طلب معلومات اتصال جديد</b>\n----------------------------\n<b>ID:</b> <code>${requestId}</code>\n👤 <b>الاسم:</b> ${escapeHtml(cleanName)}\n🏢 <b>الشركة:</b> ${escapeHtml(cleanCompany)}\n💼 <b>المنصب:</b> ${escapeHtml(cleanPosition)}\n📧 <b>الإيميل:</b> ${escapeHtml(cleanEmail)}\n📱 <b>الجوال:</b> ${escapeHtml(cleanMobile)}`;
+        if (cleanNotes) {
+            telegramHtml += `\n📝 <b>ملاحظات:</b> ${escapeHtml(cleanNotes)}`;
+        }
+        telegramHtml += `\n----------------------------\n✅ للموافقة: /approve_${requestId}\n❌ للرفض: /reject_${requestId}`;
 
         if (tgToken && chatId) {
             await axios.post(`https://api.telegram.org/bot${tgToken}/sendMessage`, {

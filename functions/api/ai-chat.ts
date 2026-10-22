@@ -36,6 +36,19 @@ function getDomainFallbackAnswer(query: string, langHint: "ar" | "en"): string {
         : "Welcome! Fawaz Al-Jubaili is a Technical Solutions & Systems Management Professional and ZATCA Certified Customs Specialist. Feel free to ask about his experience, certifications, or schedule a meeting.";
 }
 
+const CORS_HEADERS = {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type",
+};
+
+export async function onRequestOptions(): Promise<Response> {
+    return new Response(null, {
+        status: 204,
+        headers: CORS_HEADERS,
+    });
+}
+
 export async function onRequestPost(context: { request: Request; env: Env }): Promise<Response> {
     try {
         const body = await context.request.json().catch(() => ({})) as { query?: string; context?: string; systemPrompt?: string };
@@ -44,7 +57,7 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
         if (!query || typeof query !== "string") {
             return new Response(JSON.stringify({ error: "Query is required" }), {
                 status: 400,
-                headers: { "Content-Type": "application/json" }
+                headers: { "Content-Type": "application/json", ...CORS_HEADERS }
             });
         }
 

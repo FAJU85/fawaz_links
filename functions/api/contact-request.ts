@@ -6,6 +6,22 @@ interface Env {
     [key: string]: any;
 }
 
+const CORS_HEADERS = {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type",
+};
+
+function jsonResponse(data: any, status = 200): Response {
+    return new Response(JSON.stringify(data), {
+        status,
+        headers: {
+            "Content-Type": "application/json",
+            ...CORS_HEADERS,
+        },
+    });
+}
+
 function escapeHtml(str: string): string {
     return (str || "")
         .replace(/&/g, "&amp;")
@@ -17,30 +33,50 @@ function isValidEmail(email: string): boolean {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
+function toBase64Utf8(str: string): string {
+    try {
+        const bytes = new TextEncoder().encode(str);
+        let binary = "";
+        for (let i = 0; i < bytes.length; i++) {
+            binary += String.fromCharCode(bytes[i]);
+        }
+        return btoa(binary);
+    } catch {
+        return btoa(unescape(encodeURIComponent(str)));
+    }
+}
+
+export async function onRequestOptions(): Promise<Response> {
+    return new Response(null, {
+        status: 204,
+        headers: CORS_HEADERS,
+    });
+}
+
 export async function onRequestPost(context: { request: Request; env: Env }): Promise<Response> {
     try {
         const body = await context.request.json().catch(() => ({})) as Record<string, string>;
-        const { name, company, position, mobile, email } = body;
+        const rawName = body.name || body.fullName || body.full_name;
+        const rawEmail = body.email;
+        const rawCompany = body.company || body.organization || "غير محدد";
+        const rawPosition = body.position || body.title || body.service || "طلب تواصل";
+        const rawMobile = body.mobile || body.phone;
+        const rawNotes = body.notes || body.message || "";
 
-        if (!name || !email || !company || !position) {
-            return new Response(JSON.stringify({ error: "Missing required fields" }), {
-                status: 400,
-                headers: { "Content-Type": "application/json" }
-            });
+        if (!rawName || !rawEmail) {
+            return jsonResponse({ error: "Missing required fields (name and email)" }, 400);
         }
 
-        const cleanEmail = String(email).trim();
+        const cleanEmail = String(rawEmail).trim();
         if (!isValidEmail(cleanEmail)) {
-            return new Response(JSON.stringify({ error: "Invalid email address" }), {
-                status: 400,
-                headers: { "Content-Type": "application/json" }
-            });
+            return jsonResponse({ error: "Invalid email address" }, 400);
         }
 
-        const cleanName = String(name).trim();
-        const cleanCompany = String(company).trim();
-        const cleanPosition = String(position).trim();
-        const cleanMobile = mobile ? String(mobile).trim() : "N/A";
+        const cleanName = String(rawName).trim();
+        const cleanCompany = String(rawCompany).trim();
+        const cleanPosition = String(rawPosition).trim();
+        const cleanMobile = rawMobile ? String(rawMobile).trim() : "N/A";
+        const cleanNotes = rawNotes ? String(rawNotes).trim() : "";
 
         const requestId = Math.random().toString(36).substring(2, 9);
         const timestamp = new Date().toISOString();
@@ -52,6 +88,7 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
             position: cleanPosition,
             mobile: cleanMobile,
             email: cleanEmail,
+            notes: cleanNotes,
             timestamp,
             status: "pending"
         };
@@ -64,7 +101,11 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
         // 1. Send Telegram Notification if configured
         if (tgToken && chatId) {
             try {
-                const telegramHtml = `🔔 <b>طلب معلومات اتصال جديد</b>\n----------------------------\n<b>ID:</b> <code>${requestId}</code>\n👤 <b>الاسم:</b> ${escapeHtml(cleanName)}\n🏢 <b>الشركة:</b> ${escapeHtml(cleanCompany)}\n💼 <b>المنصب:</b> ${escapeHtml(cleanPosition)}\n📧 <b>الإيميل:</b> ${escapeHtml(cleanEmail)}\n📱 <b>الجوال:</b> ${escapeHtml(cleanMobile)}\n----------------------------\n✅ للموافقة: /approve_${requestId}\n❌ للرفض: /reject_${requestId}`;
+                let telegramHtml = `🔔 <b>طلب معلومات اتصال جديد</b>\n----------------------------\n<b>ID:</b> <code>${requestId}</code>\n👤 <b>الاسم:</b> ${escapeHtml(cleanName)}\n🏢 <b>الشركة:</b> ${escapeHtml(cleanCompany)}\n💼 <b>المنصب:</b> ${escapeHtml(cleanPosition)}\n📧 <b>الإيميل:</b> ${escapeHtml(cleanEmail)}\n📱 <b>الجوال:</b> ${escapeHtml(cleanMobile)}`;
+                if (cleanNotes) {
+                    telegramHtml += `\n📝 <b>ملاحظات:</b> ${escapeHtml(cleanNotes)}`;
+                }
+                telegramHtml += `\n----------------------------\n✅ للموافقة: /approve_${requestId}\n❌ للرفض: /reject_${requestId}`;
 
                 await fetch(`https://api.telegram.org/bot${tgToken}/sendMessage`, {
                     method: "POST",
@@ -84,7 +125,7 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
         if (hfToken && hfDataset) {
             try {
                 const jsonString = JSON.stringify(dataRecord, null, 2);
-                const b64 = btoa(unescape(encodeURIComponent(jsonString)));
+                const b64 = toBase64Utf8(jsonString);
 
                 await fetch(`https://huggingface.co/api/datasets/${hfDataset}/commit/main`, {
                     method: "POST",
@@ -107,18 +148,12 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
             }
         }
 
-        return new Response(JSON.stringify({
+        return jsonResponse({
             success: true,
             message: "Request received successfully",
             requestId
-        }), {
-            status: 200,
-            headers: { "Content-Type": "application/json" }
         });
     } catch (err: any) {
-        return new Response(JSON.stringify({ error: "Internal Server Error" }), {
-            status: 500,
-            headers: { "Content-Type": "application/json" }
-        });
+        return jsonResponse({ error: err.message || "Internal Server Error" }, 500);
     }
 }
