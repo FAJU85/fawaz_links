@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>Fawaz Professional Links</title>
+    <meta name="description" content="Premium bilingual (Arabic/English) professional conversion system for Fawaz Al-Jubaili. Features a high-end LinkTree, dedicated PDF viewer, and localStorage-based CMS.">
+    <meta property="og:title" content="Fawaz Professional Links">
+    <meta property="og:description" content="Premium bilingual (Arabic/English) professional conversion system for Fawaz Al-Jubaili. Features a high-end LinkTree, dedicated PDF viewer, and localStorage-based CMS.">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&family=Almarai:wght@300;400;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/main.css">
+    <script id="chatway" async="true" src="https://cdn.chatway.app/widget.js?id=kWWXFggOP7oR"></script>
+</head>
+<body>
+    <div class="container animate-fade-in">
+        <!-- Top Nav Bar (Clean, non-intrusive) -->
+        <div class="top-bar">
+            <button class="theme-toggle" id="theme-toggle" title="تبديل المظهر / Toggle Theme" aria-label="Toggle Theme">
+                <svg id="theme-icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                <svg id="theme-icon-sun" class="hidden" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+            </button>
+        </div>
+
+        <!-- Profile Section -->
+        <header class="profile-section">
+            <div class="avatar-wrapper" id="cms-trigger" title="فواز عبد الكريم الجبيلي (Triple-click for CMS)">
+                <div class="avatar-frame">
+                    <img src="https://i.postimg.cc/prhkR9k5/file-000000009abc720a9bee18da53464b9c.png" alt="فواز عبد الكريم الجبيلي" class="avatar" id="profile-avatar">
+                </div>
+            </div>
+            
+            <!-- Availability Badge: Positioned cleanly beneath avatar with calibrated margins -->
+            <div class="availability-badge" id="availability-badge" data-status="available">
+                <span class="badge-dot"></span>
+                <span id="availability-text">جاهز للعمل</span>
+            </div>
+            
+            <h1 class="profile-name" id="fullName">فواز عبد الكريم الجبيلي</h1>
+            <p class="profile-bio" id="bio_ar" dir="rtl">باحث عن فرص مهنية في الحلول التقنية وإدارة الأنظمة والتخليص الجمركي (ZATCA).</p>
+            <p class="profile-bio-en" id="bio_en" dir="ltr">Technical Solutions &amp; Systems Management Professional | ZATCA Certified</p>
+            
+            <!-- Minimal Zero-Pill Certifications Strip -->
+            <div class="certifications-strip">
+                <span class="cert-item"><span class="cert-dot"></span>ZATCA Certified</span>
+                <span class="cert-sep">/</span>
+                <span class="cert-item"><span class="cert-dot"></span>Oracle ERP</span>
+                <span class="cert-sep">/</span>
+                <span class="cert-item"><span class="cert-dot"></span>Systems Solutions</span>
+            </div>
+        </header>
+
+        <!-- Primary Actions (Structured SaaS Buttons) -->
+        <div class="links-container">
+            <!-- PRIMARY BUTTON: Reserved solely for "View CV" -->
+            <a href="pdf_viewer.html" class="btn btn-primary" id="cv-view-btn">
+                <div class="btn-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                </div>
+                <div class="btn-content">
+                    <span class="btn-title">استعراض السيرة الذاتية</span>
+                    <span class="btn-sub" dir="ltr">View CV (ATS PDF)</span>
+                </div>
+                <svg class="btn-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            </a>
+
+            <!-- SECONDARY BUTTON: Schedule Meeting -->
+            <a href="https://calendly.com/fj-150991/30min" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">
+                <div class="btn-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                </div>
+                <div class="btn-content">
+                    <span class="btn-title">حجز لقاء مهني</span>
+                    <span class="btn-sub" dir="ltr">Schedule 30-min Meeting</span>
+                </div>
+                <svg class="btn-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            </a>
+
+            <!-- SECONDARY BUTTON: LinkedIn Profile -->
+            <a href="https://www.linkedin.com/in/fawaz-aljobaili/" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">
+                <div class="btn-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+                </div>
+                <div class="btn-content">
+                    <span class="btn-title">الملف المهني لينكد إن</span>
+                    <span class="btn-sub" dir="ltr">LinkedIn Profile</span>
+                </div>
+                <svg class="btn-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            </a>
+        </div>
+
+        <!-- Contact Form Section -->
+        <section class="card-minimal animate-fade-in">
+            <div class="card-header">
+                <h2 class="form-heading">🚀 ابدأ محادثة مباشرة</h2>
+                <p class="form-subheading" dir="ltr">Direct professional contact &amp; inquiry</p>
+            </div>
+            
+            <form id="contact-request-form">
+                <div class="form-group">
+                    <label class="form-label">
+                        <span>الاسم الكامل</span>
+                        <span class="form-label-en" dir="ltr">Full Name</span>
+                    </label>
+                    <input type="text" name="name" required class="form-input" placeholder="مثال: عبد الله أحمد" dir="auto">
+                </div>
+                
+                <div class="form-grid-2">
+                    <div class="form-group">
+                        <label class="form-label">
+                            <span>الشركة</span>
+                            <span class="form-label-en" dir="ltr">Company</span>
+                        </label>
+                        <input type="text" name="company" required class="form-input" placeholder="اسم المنشأة" dir="auto">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">
+                            <span>المسمى الوظيفي</span>
+                            <span class="form-label-en" dir="ltr">Title</span>
+                        </label>
+                        <input type="text" name="position" required class="form-input" placeholder="المنصب أو الدور" dir="auto">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        <span>البريد الإلكتروني</span>
+                        <span class="form-label-en" dir="ltr">Email Address</span>
+                    </label>
+                    <input type="email" name="email" required class="form-input" placeholder="name@company.com" dir="ltr">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        <span>رقم الجوال</span>
+                        <span class="form-label-en" dir="ltr">Mobile (Optional)</span>
+                    </label>
+                    <input type="tel" name="mobile" class="form-input" placeholder="+966 5x xxx xxxx" dir="ltr">
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-submit" id="submit-contact-req">
+                    <span>إرسال طلب التواصل</span>
+                    <span class="btn-sub-inline" dir="ltr">· Send Request</span>
+                </button>
+            </form>
+            <p id="contact-form-msg" style="font-size: 0.85rem; text-align: center; margin-top: 12px; display: none; font-weight: 600;"></p>
+        </section>
+
+        <!-- Footer -->
+        <footer>
+            <button type="button" class="footer-link" id="cms-footer-trigger" style="background:none;border:none;cursor:pointer;font-family:inherit;" title="دخول لوحة التحكم / Admin Console">Admin Console v2.6</button>
+        </footer>
+    </div>
+
+    <!-- PIN Prompt Modal -->
+    <div class="modal-overlay" id="pin-modal-overlay">
+        <div class="modal" style="max-width: 360px; text-align: center;">
+            <h2 style="font-weight: 800; font-size: 1.15rem; margin-bottom: 8px;">Admin Console Access</h2>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 20px;">يرجى إدخال رمز المرور للدخول / Enter Master PIN</p>
+            <form id="pin-form">
+                <div class="form-group">
+                    <input type="password" id="pin-input" class="form-input" style="text-align: center; font-size: 1.25rem; letter-spacing: 0.25em;" placeholder="••••" required autofocus>
+                </div>
+                <p id="pin-error-msg" style="color: #DC2626; font-size: 0.8rem; margin-bottom: 12px; display: none;"></p>
+                <div style="display: flex; gap: 8px;">
+                    <button type="submit" class="btn btn-primary btn-submit" style="flex: 1; padding: 12px; margin-top: 0;">دخول</button>
+                    <button type="button" id="pin-cancel-btn" class="btn btn-secondary" style="flex: 1; padding: 12px; justify-content: center;">إلغاء</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- CMS Control Center Modal -->
+    <div class="modal-overlay" id="modal-overlay">
+        <div class="modal">
+            <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                <h2 style="font-weight: 800; font-size: 1.25rem;">Control Center</h2>
+                <button id="close-modal" style="background: none; border: none; cursor: pointer; color: var(--text-muted);" aria-label="Close modal">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </header>
+
+            <form id="cms-form" style="display: flex; flex-direction: column; gap: 18px;">
+                <div class="form-group">
+                    <label class="form-label">حالة العمل / Availability Status</label>
+                    <select name="availability" class="form-input">
+                        <option value="available">🟢 جاهز للعمل / Available</option>
+                        <option value="busy">🟡 مشغول حالياً / Busy</option>
+                        <option value="unavailable">🔴 غير متاح / Unavailable</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">ملف السيرة الذاتية / CV Resource</label>
+                    <input type="text" name="cv_url" id="cms-cv-url" class="form-input" placeholder="/assets/fawaz_aljubaili_cv.pdf or https://...">
+                    <div style="margin-top: 8px;">
+                        <label class="btn btn-secondary" style="font-size: 0.78rem; padding: 10px; cursor: pointer; justify-content: center;">
+                            📤 رفع سيرة ذاتية جديدة (Upload PDF)
+                            <input type="file" id="cv-upload-input" accept=".pdf" style="display: none;">
+                        </label>
+                        <div id="cv-upload-status" style="font-size: 11px; margin-top: 6px; font-weight: 700;"></div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">النبذة بالعربية / Arabic Bio</label>
+                    <textarea name="bio_ar" id="cms-bio-ar" rows="3" class="form-input" style="font-family: 'Tajawal';"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">النبذة بالإنجليزية / English Bio</label>
+                    <textarea name="bio_en" id="cms-bio-en" rows="3" class="form-input" dir="ltr"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">تعليمات الذكاء الاصطناعي / System Prompt</label>
+                    <textarea name="system_prompt" id="cms-system-prompt" rows="5" class="form-input" style="font-size: 11px; font-family: monospace;" dir="ltr"></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-submit" id="cms-save-btn">حفظ التغييرات / Apply Changes</button>
+                <div id="cms-status-msg" style="display: none; font-size: 0.85rem; text-align: center; font-weight: 700; margin-top: 4px;"></div>
+            </form>
+
+            <!-- Received Requests Accordion -->
+            <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border);">
+                <button type="button" id="load-requests-btn" class="btn btn-secondary" style="font-size: 0.82rem; padding: 10px; justify-content: center;">
+                    📋 عرض طلبات التواصل المستلمة / View Contact Requests
+                </button>
+                <div id="requests-list" style="margin-top: 12px; display: none; font-size: 0.8rem; max-height: 180px; overflow-y: auto;"></div>
+            </div>
+
+            <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border);">
+                <div style="display: flex; gap: 10px;">
+                    <button id="export-btn" class="btn btn-secondary" style="font-size: 12px; justify-content: center;">Export Backup</button>
+                    <label class="btn btn-secondary" style="font-size: 12px; cursor: pointer; justify-content: center;">
+                        Import Backup
+                        <input type="file" id="import-input" style="display: none;" accept=".json">
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating AI Assistant (Positioned bottom-left to avoid colliding with Chatway) -->
+    <div class="ai-bubble" id="ai-bubble" title="المستشار الذكي / AI Advisor" aria-label="AI Advisor">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+    </div>
+
+    <div class="ai-drawer" id="ai-drawer">
+        <header class="ai-header">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <div class="ai-dot"></div>
+                <span style="font-weight: 800; font-size: 13px;">المساعد المهني الذكي / AI Advisor</span>
+            </div>
+            <button id="close-ai" style="background: none; border: none; color: white; cursor: pointer;" aria-label="Close Assistant">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+        </header>
+        <div class="ai-messages" id="ai-messages">
+            <div class="message message-ai">
+                أهلاً بك! أنا المساعد الذكي الخاص بفواز الجبيلي. يمكنك سؤالي عن خبراته، شهاداته المهنية في التخليص الجمركي (ZATCA)، أو أنظمة Oracle ERP. كيف يمكنني مساعدتك اليوم؟
+            </div>
+        </div>
+        <form class="ai-input-area" id="ai-form">
+            <input type="text" class="form-input" id="ai-input" placeholder="اكتب سؤالك هنا... / Ask something..." required style="border-radius: 12px; padding: 10px 14px; min-height: 40px;" dir="auto">
+            <button type="submit" class="btn btn-primary" style="width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; padding: 0; flex-shrink: 0;" aria-label="Send message">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            </button>
+        </form>
+    </div>
+
+    <script type="module" src="/cms.ts"></script>
+</body>
+</html>

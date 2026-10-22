@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إلغاء الاشتراك | Unsubscribe</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/main.css">
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background-color: var(--bg);
+            padding: 2rem;
+        }
+        .unsubscribe-card {
+            background: var(--card);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: 2rem;
+            padding: 3rem;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
+        }
+        .success-icon {
+            width: 64px;
+            height: 64px;
+            background: var(--accent-soft);
+            color: var(--primary);
+            border-radius: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 2rem;
+        }
+        h1 { font-weight: 900; margin-bottom: 1rem; color: var(--text); }
+        p { color: var(--text-muted); line-height: 1.6; margin-bottom: 2rem; }
+        .email-pill {
+            display: inline-block;
+            background: var(--bg);
+            padding: 0.5rem 1rem;
+            border-radius: 1rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border);
+        }
+    </style>
+</head>
+<body>
+    <div class="unsubscribe-card">
+        <div class="success-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        </div>
+        <h1>تم إلغاء الاشتراك بنجاح</h1>
+        <p>لقد تمت إزالة بريدك الإلكتروني من قائمة المراسلات المهنية الخاصة بفواز الجبيلي.</p>
+        
+        <div class="email-pill">{{EMAIL}}</div>
+        
+        <a href="{{SITE_URL}}" class="btn btn-primary" style="justify-content: center;">العودة للرئيسية</a>
+    </div>
+</body>
+</html>

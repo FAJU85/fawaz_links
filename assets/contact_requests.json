@@ -1,0 +1,22 @@
+[
+  {
+    "requestId": "7yzmqii",
+    "name": "John_Doe",
+    "company": "Company_A",
+    "position": "Lead_Dev",
+    "mobile": "+966555123456",
+    "email": "john_doe@example.com",
+    "timestamp": "2026-10-21T23:09:48.158Z",
+    "status": "pending"
+  },
+  {
+    "requestId": "kjli5lb",
+    "name": "Ali",
+    "company": "TechCo",
+    "position": "HR Manager",
+    "mobile": "+966500000000",
+    "email": "ali@techco.com",
+    "timestamp": "2026-10-21T23:09:33.826Z",
+    "status": "pending"
+  }
+]

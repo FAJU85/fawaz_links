@@ -1,0 +1,8 @@
+{
+  "name": "Fawaz Professional Links",
+  "description": "Premium bilingual (Arabic/English) professional conversion system for Fawaz Al-Jubaili. Features a high-end LinkTree, dedicated PDF viewer, and localStorage-based CMS.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
