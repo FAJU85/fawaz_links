@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "tsx server.ts",
     "build": "vite build",
+    "deploy": "npm run build && wrangler deploy",
     "preview": "vite preview",
     "clean": "rm -rf dist",
     "lint": "tsc --noEmit"
@@ -25,7 +26,6 @@
     "react": "^19.0.1",
     "react-dom": "^19.0.1",
     "validator": "^13.15.35",
-    "vite": "^6.2.3",
     "zod": "^4.4.2"
   },
   "devDependencies": {
@@ -35,6 +35,7 @@
     "tailwindcss": "^4.1.14",
     "tsx": "^4.21.0",
     "typescript": "~5.8.2",
-    "vite": "^6.2.3"
+    "vite": "^6.2.3",
+    "wrangler": "^4.151.3"
   }
 }
