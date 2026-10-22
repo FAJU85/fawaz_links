@@ -19,38 +19,16 @@ if (!fs.existsSync(assetsDir)) {
     fs.mkdirSync(assetsDir, { recursive: true });
 }
 
-// Contact requests storage file
-const requestsFilePath = path.join(assetsDir, "contact_requests.json");
-if (!fs.existsSync(requestsFilePath)) {
-    fs.writeFileSync(requestsFilePath, JSON.stringify([]), "utf-8");
-}
+// Contact requests in-memory storage (prevents dirtying git workspace)
+const inMemoryRequests: any[] = [];
 
 function saveContactRequestLocally(record: Record<string, any>) {
-    try {
-        let list: any[] = [];
-        if (fs.existsSync(requestsFilePath)) {
-            const raw = fs.readFileSync(requestsFilePath, "utf-8");
-            list = JSON.parse(raw || "[]");
-        }
-        list.unshift(record);
-        // Keep last 100 requests
-        if (list.length > 100) list = list.slice(0, 100);
-        fs.writeFileSync(requestsFilePath, JSON.stringify(list, null, 2), "utf-8");
-    } catch (err) {
-        console.error("Failed to save contact request locally:", err);
-    }
+    inMemoryRequests.unshift(record);
+    if (inMemoryRequests.length > 100) inMemoryRequests.pop();
 }
 
 function getStoredContactRequests(): any[] {
-    try {
-        if (fs.existsSync(requestsFilePath)) {
-            const raw = fs.readFileSync(requestsFilePath, "utf-8");
-            return JSON.parse(raw || "[]");
-        }
-    } catch (err) {
-        console.error("Failed to read contact requests:", err);
-    }
-    return [];
+    return inMemoryRequests;
 }
 
 // Configure Multer for PDF storage
@@ -223,10 +201,10 @@ app.post("/api/contact-request", async (req: Request, res: Response) => {
     const cleanMobile = rawMobile ? String(rawMobile).trim() : "N/A";
     const cleanNotes = rawNotes ? String(rawNotes).trim() : "";
 
-    const hfToken = process.env.HF_TOKEN;
-    const hfDataset = process.env.HF_DATASET;
     const tgToken = process.env.TELEGRAM_BOT_TOKEN;
     const chatId = process.env.TELEGRAM_CHAT_ID;
+    const hfToken = process.env.HF_TOKEN;
+    const hfDataset = process.env.HF_DATASET;
 
     try {
         const timestamp = new Date().toISOString();
@@ -246,40 +224,75 @@ app.post("/api/contact-request", async (req: Request, res: Response) => {
         // 1. Always save locally first so recruiter requests are never lost
         saveContactRequestLocally(dataRecord);
 
-        // 2. Hugging Face dataset backup if configured
+        let tgSent = false;
+        let tgDetails = "";
+
+        // 2. Telegram Notification with robust HTML parsing & plaintext fallback (immediate priority)
+        if (tgToken && chatId) {
+            let telegramHtml = `🔔 <b>طلب معلومات اتصال جديد</b>\n----------------------------\n<b>ID:</b> <code>${requestId}</code>\n👤 <b>الاسم:</b> ${escapeHtml(cleanName)}\n🏢 <b>الشركة:</b> ${escapeHtml(cleanCompany)}\n💼 <b>المنصب:</b> ${escapeHtml(cleanPosition)}\n📧 <b>الإيميل:</b> ${escapeHtml(cleanEmail)}\n📱 <b>الجوال:</b> ${escapeHtml(cleanMobile)}`;
+            if (cleanNotes) {
+                telegramHtml += `\n📝 <b>ملاحظات:</b> ${escapeHtml(cleanNotes)}`;
+            }
+            telegramHtml += `\n----------------------------\n✅ للموافقة: /approve_${requestId}\n❌ للرفض: /reject_${requestId}`;
+
+            try {
+                const tgRes = await axios.post(`https://api.telegram.org/bot${tgToken}/sendMessage`, {
+                    chat_id: chatId,
+                    text: telegramHtml,
+                    parse_mode: "HTML"
+                }, { timeout: 8000 });
+
+                if (tgRes.data?.ok) {
+                    tgSent = true;
+                    tgDetails = `Delivered to Telegram (Msg ID: ${tgRes.data.result?.message_id})`;
+                }
+            } catch (tgErr: any) {
+                console.warn("Telegram HTML failed, attempting plaintext fallback:", tgErr.response?.data?.description || tgErr.message);
+                try {
+                    const plainText = `🔔 طلب معلومات اتصال جديد\n----------------------------\nID: ${requestId}\n👤 الاسم: ${cleanName}\n🏢 الشركة: ${cleanCompany}\n💼 المنصب: ${cleanPosition}\n📧 الإيميل: ${cleanEmail}\n📱 الجوال: ${cleanMobile}${cleanNotes ? `\n📝 ملاحظات: ${cleanNotes}` : ''}\n----------------------------\n✅ للموافقة: /approve_${requestId}\n❌ للرفض: /reject_${requestId}`;
+                    const fbRes = await axios.post(`https://api.telegram.org/bot${tgToken}/sendMessage`, {
+                        chat_id: chatId,
+                        text: plainText
+                    }, { timeout: 8000 });
+                    if (fbRes.data?.ok) {
+                        tgSent = true;
+                        tgDetails = `Delivered via fallback (Msg ID: ${fbRes.data.result?.message_id})`;
+                    }
+                } catch (fbErr: any) {
+                    console.error("Telegram delivery error:", fbErr.response?.data || fbErr.message);
+                    tgDetails = fbErr.response?.data?.description || fbErr.message;
+                }
+            }
+        }
+
+        // 3. Hugging Face dataset backup (optional, non-blocking)
         if (hfToken && hfDataset) {
             try {
                 const content = Buffer.from(JSON.stringify(dataRecord, null, 2)).toString("base64");
-                await axios.post(`https://huggingface.co/api/datasets/${hfDataset}/commit/main`, {
+                const hfRes = await axios.post(`https://huggingface.co/api/datasets/${hfDataset}/commit/main`, {
                     actions: [{ action: "create", path: `requests/req_${requestId}.json`, content: content, encoding: "base64" }],
                     message: `New contact request from ${cleanName}`
                 }, { 
                     headers: { Authorization: `Bearer ${hfToken}` },
-                    timeout: 5000
+                    timeout: 5000,
+                    validateStatus: () => true
                 });
+
+                if (hfRes.status >= 400) {
+                    console.warn(`HF backup skipped (HTTP ${hfRes.status}):`, hfRes.data?.error || hfRes.statusText);
+                }
             } catch (hfErr: any) {
-                console.error("HF API Error:", hfErr.response?.data || hfErr.message);
+                console.warn("HF backup skipped:", hfErr.response?.data?.error || hfErr.message);
             }
         }
 
-        // 3. Telegram Notification with robust HTML parsing (avoid Markdown underscore bugs)
-        let telegramHtml = `🔔 <b>طلب معلومات اتصال جديد</b>\n----------------------------\n<b>ID:</b> <code>${requestId}</code>\n👤 <b>الاسم:</b> ${escapeHtml(cleanName)}\n🏢 <b>الشركة:</b> ${escapeHtml(cleanCompany)}\n💼 <b>المنصب:</b> ${escapeHtml(cleanPosition)}\n📧 <b>الإيميل:</b> ${escapeHtml(cleanEmail)}\n📱 <b>الجوال:</b> ${escapeHtml(cleanMobile)}`;
-        if (cleanNotes) {
-            telegramHtml += `\n📝 <b>ملاحظات:</b> ${escapeHtml(cleanNotes)}`;
-        }
-        telegramHtml += `\n----------------------------\n✅ للموافقة: /approve_${requestId}\n❌ للرفض: /reject_${requestId}`;
-
-        if (tgToken && chatId) {
-            await axios.post(`https://api.telegram.org/bot${tgToken}/sendMessage`, {
-                chat_id: chatId,
-                text: telegramHtml,
-                parse_mode: "HTML"
-            }, { timeout: 5000 }).catch(err => {
-                console.error("Telegram API Error:", err.response?.data || err.message);
-            });
-        }
-
-        return res.json({ success: true, message: "Request received successfully", requestId });
+        return res.json({ 
+            success: true, 
+            message: "Request received successfully", 
+            requestId,
+            telegramDelivered: tgSent,
+            telegramDetails: tgDetails
+        });
     } catch (error: any) {
         console.error("Backend Processing Error:", error.message);
         return res.status(500).json({ error: "Internal Server Error" });

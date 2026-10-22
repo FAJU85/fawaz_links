@@ -98,7 +98,10 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
         const hfToken = context.env.HF_TOKEN;
         const hfDataset = context.env.HF_DATASET;
 
-        // 1. Send Telegram Notification if configured
+        let tgSent = false;
+        let tgDetails = "";
+
+        // 1. Send Telegram Notification immediately with plaintext fallback
         if (tgToken && chatId) {
             try {
                 let telegramHtml = `🔔 <b>طلب معلومات اتصال جديد</b>\n----------------------------\n<b>ID:</b> <code>${requestId}</code>\n👤 <b>الاسم:</b> ${escapeHtml(cleanName)}\n🏢 <b>الشركة:</b> ${escapeHtml(cleanCompany)}\n💼 <b>المنصب:</b> ${escapeHtml(cleanPosition)}\n📧 <b>الإيميل:</b> ${escapeHtml(cleanEmail)}\n📱 <b>الجوال:</b> ${escapeHtml(cleanMobile)}`;
@@ -107,7 +110,7 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
                 }
                 telegramHtml += `\n----------------------------\n✅ للموافقة: /approve_${requestId}\n❌ للرفض: /reject_${requestId}`;
 
-                await fetch(`https://api.telegram.org/bot${tgToken}/sendMessage`, {
+                const tgRes = await fetch(`https://api.telegram.org/bot${tgToken}/sendMessage`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
@@ -116,18 +119,43 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
                         parse_mode: "HTML"
                     })
                 });
-            } catch (tgErr) {
+
+                const tgData = await tgRes.json().catch(() => ({})) as any;
+                if (tgRes.ok && tgData.ok) {
+                    tgSent = true;
+                    tgDetails = `Message delivered to Telegram (ID: ${tgData.result?.message_id})`;
+                } else {
+                    console.warn("Telegram HTML failed, attempting plaintext fallback:", tgData?.description);
+                    const plainText = `🔔 طلب معلومات اتصال جديد\n----------------------------\nID: ${requestId}\n👤 الاسم: ${cleanName}\n🏢 الشركة: ${cleanCompany}\n💼 المنصب: ${cleanPosition}\n📧 الإيميل: ${cleanEmail}\n📱 الجوال: ${cleanMobile}${cleanNotes ? `\n📝 ملاحظات: ${cleanNotes}` : ''}\n----------------------------\n✅ للموافقة: /approve_${requestId}\n❌ للرفض: /reject_${requestId}`;
+                    const fbRes = await fetch(`https://api.telegram.org/bot${tgToken}/sendMessage`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            chat_id: chatId,
+                            text: plainText
+                        })
+                    });
+                    const fbData = await fbRes.json().catch(() => ({})) as any;
+                    if (fbRes.ok && fbData.ok) {
+                        tgSent = true;
+                        tgDetails = `Message delivered via fallback (ID: ${fbData.result?.message_id})`;
+                    } else {
+                        tgDetails = fbData?.description || "Failed to deliver Telegram message";
+                    }
+                }
+            } catch (tgErr: any) {
                 console.error("Cloudflare Pages Telegram error:", tgErr);
+                tgDetails = tgErr.message || "Telegram network error";
             }
         }
 
-        // 2. Backup to Hugging Face dataset if configured
+        // 2. Backup to Hugging Face dataset if configured (optional, non-blocking)
         if (hfToken && hfDataset) {
             try {
                 const jsonString = JSON.stringify(dataRecord, null, 2);
                 const b64 = toBase64Utf8(jsonString);
 
-                await fetch(`https://huggingface.co/api/datasets/${hfDataset}/commit/main`, {
+                const hfRes = await fetch(`https://huggingface.co/api/datasets/${hfDataset}/commit/main`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -143,15 +171,22 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
                         message: `New contact request from ${cleanName}`
                     })
                 });
-            } catch (hfErr) {
-                console.error("Cloudflare Pages HF backup error:", hfErr);
+
+                if (!hfRes.ok) {
+                    const hfData = await hfRes.json().catch(() => ({})) as any;
+                    console.warn(`Cloudflare Pages HF backup skipped (HTTP ${hfRes.status}):`, hfData?.error || hfRes.statusText);
+                }
+            } catch (hfErr: any) {
+                console.warn("Cloudflare Pages HF backup skipped:", hfErr.message || hfErr);
             }
         }
 
         return jsonResponse({
             success: true,
             message: "Request received successfully",
-            requestId
+            requestId,
+            telegramDelivered: tgSent,
+            telegramDetails: tgDetails
         });
     } catch (err: any) {
         return jsonResponse({ error: err.message || "Internal Server Error" }, 500);
